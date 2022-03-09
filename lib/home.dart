@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'custom_search.dart';
+
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
 
@@ -24,6 +26,17 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        actions: [
+          IconButton(
+      icon: const Icon(Icons.search),
+      onPressed: () {
+        showSearch(
+          context: context,
+          delegate: CustomSearchDelegate(),
+        );
+      },
+    ),
+        ],
       ),
       body: Center(
         child: Column(
@@ -44,6 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), 
+      
     );
   }
 }
