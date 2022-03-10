@@ -33,7 +33,7 @@ class CustomSearchDelegate extends SearchDelegate {
   @override
   Widget buildSuggestions(BuildContext context) {
     if(query.length > 3){
-           var temp = "THIS IS A TEST TEXT";
+      var temp = "AABAACAADAABAAABAA";
      var temp1 = query;
      List<String>pat = [];
      List<String>searchText = [];
@@ -49,14 +49,14 @@ class CustomSearchDelegate extends SearchDelegate {
   }
 
   static  getNextState(List<String>data, int m, int state, int x){
-    if(state < m && x == data[state].codeUnits.first){
-      return (state + 1);
+    if((state < m) && (x == data[state].codeUnits.elementAt(0))){
+      return state + 1;
     }
-    int ns, i;
-    for(ns = state; ns > 0; ns--){
-      if(data[ns-1].codeUnits.first == x){
-        for(i = 0; i < ns-1; i++){
-          if(data[i] != data[state - ns + 1 + i]) {
+
+    for(var ns = state; ns > 0; ns--){
+      if(data[ns-1].codeUnits.elementAt(0) == x){
+        for(var i = 0; i < ns-1; i++){
+          if(data[i] != data[state-ns+1+i]) {
             break;
           }
           if(i == ns-1){
@@ -68,29 +68,27 @@ class CustomSearchDelegate extends SearchDelegate {
     return 0;
   }
 
-  static computeTF(List<String>data , int m, List<List<int>> tf){
-    for(var state = 0; state < m; ++state){
+  static void computeTF(List<String>data , int m, List<List<int>> tf){
+    for(var state = 0; state <= m; ++state){
       for(var x = 0; x < 256; ++x){
         tf[state][x] = getNextState(data, m, state, x);
-        debugPrint("compute $state, $x, ${tf[state][x]}");
       }
-    }
-    return tf;
+    } 
   }
 
   static void search(List<String> data, List<String> data1){
     int m = data.length;
     int n = data1.length;
 
-    var TF = List.generate(m, (i) => List.filled(256, 0, growable: false));
-    TF = computeTF(data, m, TF);
+    var TF = List.generate(m+1, (i) => List.filled(256, 0, growable: true));
+    computeTF(data, m, TF);
 
     int state = 0;
     for(var i = 0; i < n; i++){
-      state = TF[state][data1[i].codeUnits.first]; //MASIH ERROR DISINI, BESOK SAMBUNG LAGI
-      debugPrint("cek state value : $state");
+      state = TF[state][data1[i].codeUnits.elementAt(0)]; 
+      debugPrint("cek state value : $state, $i, $n, ${data1[i]}");
       if(state == m){
-        debugPrint("Pattern found at index ${(i-m+1)}");
+        debugPrint("Pattern found at index ${(i-m+1)}"); //INDEX KE 12 GK MUNCUL
       }else{
         debugPrint("$state, $m");
       }
