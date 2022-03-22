@@ -22,20 +22,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
         actions: [
           IconButton(
-      icon: const Icon(Icons.search),
-      onPressed: () {
-        showSearch(
-          context: context,
-          delegate: CustomSearchDelegate(),
-        );
-      },
-    ),
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: CustomSearchDelegate(),
+              );
+            },
+          ),
         ],
       ),
       body: Center(
@@ -56,8 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: _incrementCounter,
         tooltip: 'Increment',
         child: const Icon(Icons.add),
-      ), 
-      
+      ),
     );
   }
 }
