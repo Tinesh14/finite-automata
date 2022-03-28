@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'custom_search.dart';
@@ -12,12 +13,19 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  //int _counter = 0;
+  final firestoreInstance = FirebaseFirestore.instance;
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  // void _incrementCounter() {
+  //   setState(() {
+  //     _counter++;
+  //   });
+  // }
+
+  addData(String value) {
+    firestoreInstance.collection("users").add({
+      "word": value.toString(),
+    }).then((val) => debugPrint("kita cek disini : ${val.id}"));
   }
 
   @override
@@ -40,19 +48,23 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
+          children: const <Widget>[
+            Text(
               'You have pushed the button this many times:',
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
+            // Text(
+            //   '$_counter',
+            //   style: Theme.of(context).textTheme.headline4,
+            // ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: () {
+          firestoreInstance.collection("users").add({
+            "word": "nasi lemak",
+          }).then((val) => debugPrint("kita cek disini : ${val.id}"));
+        },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),
