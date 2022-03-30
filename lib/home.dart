@@ -15,6 +15,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   //int _counter = 0;
   final firestoreInstance = FirebaseFirestore.instance;
+  TextEditingController _textFieldController = TextEditingController();
 
   // void _incrementCounter() {
   //   setState(() {
@@ -27,6 +28,9 @@ class _MyHomePageState extends State<MyHomePage> {
       "word": value.toString(),
     }).then((val) => debugPrint("kita cek disini : ${val.id}"));
   }
+
+  String codeDialog = "";
+  String valueText = "";
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: const <Widget>[
             Text(
-              'You have pushed the button this many times:',
+              'Welcome to the dictionary :)',
             ),
             // Text(
             //   '$_counter',
@@ -61,11 +65,48 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          firestoreInstance.collection("users").add({
-            "word": "nasi lemak",
-          }).then((val) => debugPrint("kita cek disini : ${val.id}"));
+          showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: const Text('Add New Word to Dictionary'),
+                  content: TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        valueText = value;
+                      });
+                    },
+                    controller: _textFieldController,
+                    decoration: const InputDecoration(hintText: "New Word"),
+                  ),
+                  actions: <Widget>[
+                    FlatButton(
+                      color: Colors.green,
+                      textColor: Colors.white,
+                      child: const Text('OK'),
+                      onPressed: () {
+                        codeDialog = valueText;
+                        debugPrint("tes : $codeDialog");
+                        firestoreInstance.collection("users").add({
+                          "word": codeDialog,
+                        }).whenComplete(() {
+                          Navigator.pop(context);
+                          _textFieldController.text = "";
+                        });
+                      },
+                    ),
+                    FlatButton(
+                      color: Colors.red,
+                      textColor: Colors.white,
+                      child: const Text('CANCEL'),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                );
+              });
         },
-        tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),
     );
