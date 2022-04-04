@@ -31,16 +31,31 @@ class CustomSearchDelegate extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    if (query.length > 3) {
-      getMarker();
-      searching("THIS IS A TEST TEXT");
-    }
+    var result = [];
+    var resultString = [];
+    getMarker().then((value) => result = value).whenComplete(
+      () {
+        if (query.length > 3) {
+          for (var element in result) {
+            var temp = searching(element.toString());
+            if (temp) {
+              resultString.add(element.toString());
+            }
+          }
+
+          for (var element in resultString) {
+            debugPrint("hasil pencarian : $element");
+          }
+        }
+      },
+    );
+    //searching("THIS IS A TEST TEXT");
     return Container();
   }
 
-  searching(String text) {
-    var temp = text;
-    var temp1 = query;
+  bool searching(String text) {
+    var temp = text.toLowerCase();
+    var temp1 = query.toLowerCase();
     List<String> pat = [];
     List<String> searchText = [];
     for (var i in temp1.runes) {
@@ -49,7 +64,8 @@ class CustomSearchDelegate extends SearchDelegate {
     for (var rune in temp.runes) {
       pat.add(String.fromCharCode(rune));
     }
-    search(searchText, pat);
+    var result = search(searchText, pat);
+    return result;
   }
 
   Future<List<String>> getMarker() async {
@@ -96,10 +112,11 @@ class CustomSearchDelegate extends SearchDelegate {
     }
   }
 
-  static void search(List<String> data, List<String> data1) {
+  static bool search(List<String> data, List<String> data1) {
     int m = data.length;
     int n = data1.length;
 
+    bool result = false;
     var TF = List.generate(m + 1, (i) => List.filled(256, 0, growable: true));
     computeTF(data, m, TF);
 
@@ -110,10 +127,11 @@ class CustomSearchDelegate extends SearchDelegate {
       if (state == m) {
         debugPrint(
             "Pattern found at index ${(i - m + 1)}"); //INDEX KE 12 GK MUNCUL
-      } else {
-        debugPrint("$state, $m");
+        result = true;
       }
     }
-    debugPrint("nilai nya : $m, $n");
+
+    return result;
+    //debugPrint("nilai nya : $m, $n");
   }
 }
