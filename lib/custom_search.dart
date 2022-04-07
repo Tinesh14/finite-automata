@@ -1,12 +1,15 @@
 // ignore_for_file: non_constant_identifier_names
 
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class CustomSearchDelegate extends SearchDelegate {
+class CustomSearchDelegate<T> extends SearchDelegate<T?> {
+  final RemoteSearchSubmitCallback remoteAdapter;
+  final String? hintText;
+  Widget? _lastWidget;
   final firestoreInstance = FirebaseFirestore.instance;
+  CustomSearchDelegate(this.remoteAdapter, {this.hintText})
+      : super(searchFieldLabel: hintText ?? null);
   @override
   List<Widget> buildActions(BuildContext context) {
     return [
@@ -32,25 +35,44 @@ class CustomSearchDelegate extends SearchDelegate {
   @override
   Widget buildResults(BuildContext context) {
     var result = [];
-    var resultString = [];
-    getMarker().then((value) => result = value).whenComplete(
-      () {
-        if (query.length > 3) {
-          for (var element in result) {
-            var temp = searching(element.toString());
-            if (temp) {
-              resultString.add(element.toString());
-            }
-          }
+    final List<String> resultString = [];
+    Widget widget = remoteAdapter.call(query, CloseRemoteSearch(context, this));
+    _lastWidget = widget;
+    // getMarker().then((value) => result = value).whenComplete(
+    //   () {
+    //     for (var element in result) {
+    //       var temp = searching(element.toString());
+    //       if (temp) {
+    //         resultString.add(element.toString());
+    //       }
+    //     }
+    //     // widgetView = ListView.builder(
+    //     //   itemCount: resultString.length,
+    //     //   padding: const EdgeInsets.all(10),
+    //     //   itemBuilder: (context, index) {
+    //     //     return Text("index : ${resultString[index]}");
+    //     //   },
+    //     // );
 
-          for (var element in resultString) {
-            debugPrint("hasil pencarian : $element");
-          }
-        }
-      },
-    );
+    //     // for (var element in resultString) {
+    //     //   debugPrint("hasil pencarian : $element");
+    //     // }
+    //     ListView.builder(
+    //       itemCount: resultString.length,
+    //       padding: const EdgeInsets.all(10),
+    //       itemBuilder: (context, index) {
+    //         return Text("index : ${resultString[index]}");
+    //       },
+    //     );
+    //   },
+    // );
+    return _lastWidget ?? SizedBox.shrink();
+
     //searching("THIS IS A TEST TEXT");
-    return Container();
+  }
+
+  ValueNotifier<bool> notifier() {
+    return ValueNotifier(false);
   }
 
   bool searching(String text) {
@@ -133,5 +155,19 @@ class CustomSearchDelegate extends SearchDelegate {
 
     return result;
     //debugPrint("nilai nya : $m, $n");
+  }
+}
+
+typedef Widget RemoteSearchSubmitCallback(
+    String text, CloseRemoteSearch closeNotifier);
+
+class CloseRemoteSearch extends ValueNotifier<bool> {
+  final SearchDelegate searchDelegate;
+  final BuildContext context;
+  CloseRemoteSearch(this.context, this.searchDelegate) : super(false);
+
+  @override
+  set value(bool newValue) {
+    if (newValue == true) searchDelegate.close(context, null);
   }
 }

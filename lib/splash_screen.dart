@@ -17,13 +17,16 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   navigateInto() async {
-    await Future.delayed(const Duration(milliseconds: 3850), () {
-      Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  const MyHomePage(title: 'Finite Automata')));
-    });
+    await Future.delayed(
+      const Duration(milliseconds: 3850),
+      () {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    const MyHomePage(title: 'Finite Automata')));
+      },
+    );
   }
 
   @override
