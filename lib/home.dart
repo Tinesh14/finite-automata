@@ -19,7 +19,9 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   //int _counter = 0;
   final firestoreInstance = FirebaseFirestore.instance;
-  TextEditingController _textFieldController = TextEditingController();
+  TextEditingController userInputHangul = TextEditingController();
+  TextEditingController userInputRomaji = TextEditingController();
+  TextEditingController userInputWord = TextEditingController();
 
   // void _incrementCounter() {
   //   setState(() {
@@ -33,16 +35,16 @@ class _MyHomePageState extends State<MyHomePage> {
     }).then((val) => debugPrint("kita cek disini : ${val.id}"));
   }
 
-  Future<List<String>> getMarker() async {
-    var snapshot = await firestoreInstance.collection('users').get();
-    var listData = snapshot.docs.map((doc) => doc.data()).toList();
-    List<String> listString = [];
-    for (var e in listData) {
-      listString.add(e['word']);
-      // debugPrint("test datanya : ${jsonEncode(e)}, ${e['word']}");
-    }
-    return listString;
-  }
+  // Future<List<String>> getMarker() async {
+  //   var snapshot = await firestoreInstance.collection('users').get();
+  //   var listData = snapshot.docs.map((doc) => doc.data()).toList();
+  //   List<String> listString = [];
+  //   for (var e in listData) {
+  //     listString.add(e['word']);
+  //     // debugPrint("test datanya : ${jsonEncode(e)}, ${e['word']}");
+  //   }
+  //   return listString;
+  // }
 
   static getNextState(List<String> data, int m, int state, int x) {
     if ((state < m) && (x == data[state].codeUnits.elementAt(0))) {
@@ -95,7 +97,6 @@ class _MyHomePageState extends State<MyHomePage> {
     //debugPrint("nilai nya : $m, $n");
   }
 
-  String codeDialog = "";
   String valueText = "";
 
   @override
@@ -112,38 +113,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 delegate: CustomSearchDelegate((search, closeNotifier) {
                   var result = [];
                   List<String> resultString = [];
-                  getMarker().then((value) => result = value).whenComplete(
-                    () {
-                      // for (var element in result) {
-                      //   var temp = element.toString().toLowerCase();
-                      //   var temp1 = search.toLowerCase();
-                      //   List<String> pat = [];
-                      //   List<String> searchText = [];
-                      //   for (var i in temp1.runes) {
-                      //     searchText.add(String.fromCharCode(i));
-                      //   }
-                      //   for (var rune in temp.runes) {
-                      //     pat.add(String.fromCharCode(rune));
-                      //   }
-                      //   var resultBool = searchString(searchText, pat);
-
-                      //   if (resultBool) {
-                      //     resultString.add(element.toString());
-                      //   }
-                      // }
-                      // widgetView = ListView.builder(
-                      //   itemCount: resultString.length,
-                      //   padding: const EdgeInsets.all(10),
-                      //   itemBuilder: (context, index) {
-                      //     return Text("index : ${resultString[index]}");
-                      //   },
-                      // );
-
-                      // for (var element in resultString) {
-                      //   debugPrint("hasil pencarian : $element");
-                      // }
-                    },
-                  );
                   //debugPrint("cek datanya : ${result.length}");
                   return StreamBuilder(
                       stream: FirebaseFirestore.instance
@@ -195,13 +164,6 @@ class _MyHomePageState extends State<MyHomePage> {
                           );
                         }
                       });
-                  // ListView.builder(
-                  //   itemCount: resultString.length,
-                  //   padding: const EdgeInsets.all(10),
-                  //   itemBuilder: (context, index) {
-                  //     return Text("index : ${resultString[index]}");
-                  //   },
-                  // );
                 }),
               );
             },
@@ -215,10 +177,6 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               'Welcome to the dictionary :)',
             ),
-            // Text(
-            //   '$_counter',
-            //   style: Theme.of(context).textTheme.headline4,
-            // ),
           ],
         ),
       ),
@@ -226,43 +184,83 @@ class _MyHomePageState extends State<MyHomePage> {
         onPressed: () {
           showDialog(
               context: context,
-              builder: (context) {
+              builder: (BuildContext context) {
                 return AlertDialog(
-                  title: const Text('Add New Word to Dictionary'),
-                  content: TextField(
-                    onChanged: (value) {
-                      setState(() {
-                        valueText = value;
-                      });
-                    },
-                    controller: _textFieldController,
-                    decoration: const InputDecoration(hintText: "New Word"),
+                  content: Stack(
+                    overflow: Overflow.visible,
+                    children: <Widget>[
+                      Positioned(
+                        right: -40.0,
+                        top: -40.0,
+                        child: InkResponse(
+                          onTap: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: CircleAvatar(
+                            child: Icon(Icons.close),
+                            backgroundColor: Colors.red,
+                          ),
+                        ),
+                      ),
+                      Form(
+                        child: Container(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: TextFormField(
+                                  controller: userInputHangul,
+                                  autofocus: true,
+                                  decoration:
+                                      InputDecoration(labelText: 'Hangul'),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: TextFormField(
+                                  controller: userInputRomaji,
+                                  decoration:
+                                      InputDecoration(labelText: 'Romaji'),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: TextFormField(
+                                  controller: userInputWord,
+                                  autofocus: true,
+                                  decoration:
+                                      InputDecoration(labelText: 'Indo'),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: RaisedButton(
+                                  child: Text("Submit"),
+                                  onPressed: () {
+                                    firestoreInstance.collection("users").add(
+                                      {
+                                        "hangul": userInputHangul.text,
+                                        "romaji": userInputRomaji.text,
+                                        "word": userInputWord.text,
+                                      },
+                                    ).whenComplete(
+                                      () {
+                                        Navigator.pop(context);
+                                        userInputHangul.text = "";
+                                        userInputRomaji.text = "";
+                                        userInputWord.text = "";
+                                      },
+                                    );
+                                  },
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  actions: <Widget>[
-                    FlatButton(
-                      color: Colors.green,
-                      textColor: Colors.white,
-                      child: const Text('OK'),
-                      onPressed: () {
-                        codeDialog = valueText;
-                        debugPrint("tes : $codeDialog");
-                        firestoreInstance.collection("users").add({
-                          "word": codeDialog,
-                        }).whenComplete(() {
-                          Navigator.pop(context);
-                          _textFieldController.text = "";
-                        });
-                      },
-                    ),
-                    FlatButton(
-                      color: Colors.red,
-                      textColor: Colors.white,
-                      child: const Text('CANCEL'),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
                 );
               });
         },
