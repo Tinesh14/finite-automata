@@ -22,6 +22,7 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController userInputHangul = TextEditingController();
   TextEditingController userInputRomaji = TextEditingController();
   TextEditingController userInputWord = TextEditingController();
+  bool indoToKorea = false;
 
   // void _incrementCounter() {
   //   setState(() {
@@ -30,9 +31,13 @@ class _MyHomePageState extends State<MyHomePage> {
   // }
 
   addData(String value) {
-    firestoreInstance.collection("users").add({
-      "word": value.toString(),
-    }).then((val) => debugPrint("kita cek disini : ${val.id}"));
+    firestoreInstance.collection("users").add(
+      {
+        "word": value.toString(),
+      },
+    ).then(
+      (val) => debugPrint("kita cek disini : ${val.id}"),
+    );
   }
 
   // Future<List<String>> getMarker() async {
@@ -99,6 +104,94 @@ class _MyHomePageState extends State<MyHomePage> {
 
   String valueText = "";
 
+  radioDialog() async {
+    await showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.grey[200],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(16),
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: const [
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text('Filter',
+                        style: TextStyle(
+                            fontSize: 25, fontWeight: FontWeight.w500)),
+                  ),
+                  // Container(
+                  //   margin:
+                  //       const EdgeInsets.only(top: 24, right: 24, bottom: 10),
+                  //   width: 25,
+                  //   height: 25,
+                  //   decoration: const BoxDecoration(
+                  //       shape: BoxShape.circle, color: Colors.orange),
+                  //   child: InkWell(
+                  //     onTap: () {
+                  //       Navigator.pop(context);
+                  //     },
+                  //     child: const Center(
+                  //       child: Icon(
+                  //         Icons.close,
+                  //         color: Colors.white,
+                  //         size: 15.0,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                ],
+              ),
+              ListTile(
+                minVerticalPadding: 0,
+                title: Text("Indo - Korea"),
+                trailing: Radio(
+                  activeColor: Colors.blue,
+                  value: 0,
+                  groupValue: -1,
+                  onChanged: (value) {
+                    setState(() {
+                      indoToKorea = true;
+                    });
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
+              Divider(
+                thickness: 2,
+                color: Colors.grey,
+              ),
+              ListTile(
+                minVerticalPadding: 0,
+                title: Text("Korea - Indo"),
+                trailing: Radio(
+                  activeColor: Colors.blue,
+                  value: 0,
+                  groupValue: -1,
+                  onChanged: (value) {
+                    setState(() {
+                      indoToKorea = false;
+                    });
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -110,11 +203,11 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: () {
               showSearch(
                 context: context,
-                delegate: CustomSearchDelegate((search, closeNotifier) {
-                  var result = [];
-                  List<String> resultString = [];
-                  //debugPrint("cek datanya : ${result.length}");
-                  return StreamBuilder(
+                delegate: CustomSearchDelegate(
+                  (search, closeNotifier) {
+                    List<dynamic> resultString = [];
+                    //debugPrint("cek datanya : ${result.length}");
+                    return StreamBuilder(
                       stream: FirebaseFirestore.instance
                           .collection('users')
                           .snapshots(),
@@ -133,13 +226,17 @@ class _MyHomePageState extends State<MyHomePage> {
                           var listData = streamSnapshot.data?.docs
                               .map((doc) => doc.data())
                               .toList();
-                          List<String> listString = [];
+                          List<dynamic> listString = [];
                           for (var e in (listData ?? [])) {
-                            listString.add(e['word']);
+                            listString.add(e);
                             // debugPrint("test datanya : ${jsonEncode(e)}, ${e['word']}");
                           }
                           for (var element in listString) {
-                            var temp = element.toString().toLowerCase();
+                            var temp = indoToKorea
+                                ? element['word'].toString().toLowerCase()
+                                : element['romaji']
+                                    .toString()
+                                    .toLowerCase(); // cek indo - korea / korea - indo
                             var temp1 = search.toLowerCase();
                             List<String> pat = [];
                             List<String> searchText = [];
@@ -152,20 +249,72 @@ class _MyHomePageState extends State<MyHomePage> {
                             var resultBool = searchString(searchText, pat);
 
                             if (resultBool) {
-                              resultString.add(element.toString());
+                              resultString.add(element);
                             }
                           }
                           return ListView.builder(
                             itemCount: resultString.length,
-                            padding: const EdgeInsets.all(30),
                             itemBuilder: (context, index) {
-                              return Text("index : ${resultString[index]}");
+                              return Card(
+                                elevation: 8,
+                                shadowColor: Colors.blue,
+                                margin: EdgeInsets.all(20),
+                                shape: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: Colors.white),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(
+                                      resultString[index]['word'] ?? "",
+                                      //"word",
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(
+                                      resultString[index]['hangul'] ?? "",
+                                      // "hangul",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        //fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                    Text(
+                                      resultString[index]['romaji'] ?? "",
+                                      // "romaji",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        //fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 5,
+                                    ),
+                                  ],
+                                ),
+                              );
+                              //Text("index : ${resultString[index]}");
                             },
                           );
                         }
-                      });
-                }),
+                      },
+                    );
+                  },
+                ),
               );
+              radioDialog();
             },
           ),
         ],
