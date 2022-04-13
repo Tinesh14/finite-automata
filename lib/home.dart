@@ -1,6 +1,4 @@
-// ignore_for_file: prefer_const_constructors
-
-import 'dart:convert';
+// ignore_for_file: prefer_const_constructors, non_constant_identifier_names, deprecated_member_use
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -17,18 +15,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  //int _counter = 0;
   final firestoreInstance = FirebaseFirestore.instance;
   TextEditingController userInputHangul = TextEditingController();
   TextEditingController userInputRomaji = TextEditingController();
   TextEditingController userInputWord = TextEditingController();
   bool indoToKorea = false;
-
-  // void _incrementCounter() {
-  //   setState(() {
-  //     _counter++;
-  //   });
-  // }
 
   addData(String value) {
     firestoreInstance.collection("users").add(
@@ -92,8 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
       state = TF[state][data1[i].codeUnits.elementAt(0)];
       debugPrint("cek state value : $state, $i, $n, ${data1[i]}");
       if (state == m) {
-        debugPrint(
-            "Pattern found at index ${(i - m + 1)}"); //INDEX KE 12 GK MUNCUL
+        debugPrint("Pattern found at index ${(i - m + 1)}");
         result = true;
       }
     }
@@ -322,9 +312,12 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const <Widget>[
-            Text(
-              'Welcome to the dictionary :)',
+          children: <Widget>[
+            Flexible(
+              child: Image.asset(
+                'assets/cover.png',
+                height: 500,
+              ),
             ),
           ],
         ),
@@ -335,80 +328,82 @@ class _MyHomePageState extends State<MyHomePage> {
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
-                  content: Stack(
-                    overflow: Overflow.visible,
-                    children: <Widget>[
-                      Positioned(
-                        right: -40.0,
-                        top: -40.0,
-                        child: InkResponse(
-                          onTap: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: CircleAvatar(
-                            child: Icon(Icons.close),
-                            backgroundColor: Colors.red,
+                  content: SingleChildScrollView(
+                    child: Stack(
+                      overflow: Overflow.visible,
+                      children: <Widget>[
+                        Positioned(
+                          right: -40.0,
+                          top: -40.0,
+                          child: InkResponse(
+                            onTap: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: CircleAvatar(
+                              child: Icon(Icons.close),
+                              backgroundColor: Colors.red,
+                            ),
                           ),
                         ),
-                      ),
-                      Form(
-                        child: Container(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: TextFormField(
-                                  controller: userInputHangul,
-                                  autofocus: true,
-                                  decoration:
-                                      InputDecoration(labelText: 'Hangul'),
+                        Form(
+                          child: Container(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: TextFormField(
+                                    controller: userInputHangul,
+                                    autofocus: true,
+                                    decoration:
+                                        InputDecoration(labelText: 'Hangul'),
+                                  ),
                                 ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: TextFormField(
-                                  controller: userInputRomaji,
-                                  decoration:
-                                      InputDecoration(labelText: 'Romaji'),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: TextFormField(
+                                    controller: userInputRomaji,
+                                    decoration:
+                                        InputDecoration(labelText: 'Romaji'),
+                                  ),
                                 ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: TextFormField(
-                                  controller: userInputWord,
-                                  autofocus: true,
-                                  decoration:
-                                      InputDecoration(labelText: 'Indo'),
+                                Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: TextFormField(
+                                    controller: userInputWord,
+                                    autofocus: true,
+                                    decoration:
+                                        InputDecoration(labelText: 'Indo'),
+                                  ),
                                 ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: RaisedButton(
-                                  child: Text("Submit"),
-                                  onPressed: () {
-                                    firestoreInstance.collection("users").add(
-                                      {
-                                        "hangul": userInputHangul.text,
-                                        "romaji": userInputRomaji.text,
-                                        "word": userInputWord.text,
-                                      },
-                                    ).whenComplete(
-                                      () {
-                                        Navigator.pop(context);
-                                        userInputHangul.text = "";
-                                        userInputRomaji.text = "";
-                                        userInputWord.text = "";
-                                      },
-                                    );
-                                  },
-                                ),
-                              )
-                            ],
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: RaisedButton(
+                                    child: Text("Submit"),
+                                    onPressed: () {
+                                      firestoreInstance.collection("users").add(
+                                        {
+                                          "hangul": userInputHangul.text,
+                                          "romaji": userInputRomaji.text,
+                                          "word": userInputWord.text,
+                                        },
+                                      ).whenComplete(
+                                        () {
+                                          Navigator.pop(context);
+                                          userInputHangul.text = "";
+                                          userInputRomaji.text = "";
+                                          userInputWord.text = "";
+                                        },
+                                      );
+                                    },
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               });
