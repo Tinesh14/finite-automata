@@ -1,7 +1,8 @@
-// ignore_for_file: prefer_const_constructors, non_constant_identifier_names, deprecated_member_use
+// ignore_for_file: non_constant_identifier_names
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 import 'custom_search.dart';
 
@@ -101,7 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
       builder: (context) {
         return AlertDialog(
           backgroundColor: Colors.grey[200],
-          shape: RoundedRectangleBorder(
+          shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(
               Radius.circular(16),
             ),
@@ -115,9 +116,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: const [
                   Padding(
                     padding: EdgeInsets.all(8.0),
-                    child: Text('Filter',
-                        style: TextStyle(
-                            fontSize: 25, fontWeight: FontWeight.w500)),
+                    child: Text(
+                      'Filter',
+                      style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ),
                   // Container(
                   //   margin:
@@ -143,34 +148,38 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               ListTile(
                 minVerticalPadding: 0,
-                title: Text("Indo - Korea"),
+                title: const Text("Indo - Korea"),
                 trailing: Radio(
                   activeColor: Colors.blue,
                   value: 0,
                   groupValue: -1,
                   onChanged: (value) {
-                    setState(() {
-                      indoToKorea = true;
-                    });
+                    setState(
+                      () {
+                        indoToKorea = true;
+                      },
+                    );
                     Navigator.pop(context);
                   },
                 ),
               ),
-              Divider(
+              const Divider(
                 thickness: 2,
                 color: Colors.grey,
               ),
               ListTile(
                 minVerticalPadding: 0,
-                title: Text("Korea - Indo"),
+                title: const Text("Korea - Indo"),
                 trailing: Radio(
                   activeColor: Colors.blue,
                   value: 0,
                   groupValue: -1,
                   onChanged: (value) {
-                    setState(() {
-                      indoToKorea = false;
-                    });
+                    setState(
+                      () {
+                        indoToKorea = false;
+                      },
+                    );
                     Navigator.pop(context);
                   },
                 ),
@@ -206,7 +215,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         // debugPrint("${streamSnapshot.data.docs.map((e) => null)}");
                         if (streamSnapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return Center(
+                          return const Center(
                             child:
                                 CircularProgressIndicator(color: Colors.blue),
                           );
@@ -242,62 +251,75 @@ class _MyHomePageState extends State<MyHomePage> {
                               resultString.add(element);
                             }
                           }
-                          return ListView.builder(
-                            itemCount: resultString.length,
-                            itemBuilder: (context, index) {
-                              return Card(
-                                elevation: 8,
-                                shadowColor: Colors.blue,
-                                margin: EdgeInsets.all(20),
-                                shape: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide(color: Colors.white),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    Text(
-                                      resultString[index]['word'] ?? "",
-                                      //"word",
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
+                          if (resultString.isNotEmpty) {
+                            return ListView.builder(
+                              itemCount: resultString.length,
+                              itemBuilder: (context, index) {
+                                return Card(
+                                  elevation: 8,
+                                  shadowColor: Colors.blue,
+                                  margin: const EdgeInsets.all(20),
+                                  shape: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide:
+                                        const BorderSide(color: Colors.white),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      const SizedBox(
+                                        height: 5,
                                       ),
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    Text(
-                                      resultString[index]['hangul'] ?? "",
-                                      // "hangul",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        //fontWeight: FontWeight.bold,
+                                      Text(
+                                        resultString[index]['word'] ?? "",
+                                        //"word",
+                                        style: TextStyle(
+                                          fontSize: indoToKorea ? 18 : 14,
+                                          fontWeight: indoToKorea
+                                              ? FontWeight.bold
+                                              : null,
+                                        ),
                                       ),
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                    Text(
-                                      resultString[index]['romaji'] ?? "",
-                                      // "romaji",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        //fontWeight: FontWeight.bold,
+                                      const SizedBox(
+                                        height: 5,
                                       ),
-                                    ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                  ],
-                                ),
-                              );
-                              //Text("index : ${resultString[index]}");
-                            },
-                          );
+                                      Text(
+                                        resultString[index]['hangul'] ?? "",
+                                        // "hangul",
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          //fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text(
+                                        resultString[index]['romaji'] ?? "",
+                                        // "romaji",
+                                        style: TextStyle(
+                                          fontSize: !indoToKorea ? 18 : 14,
+                                          fontWeight: !indoToKorea
+                                              ? FontWeight.bold
+                                              : null,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                    ],
+                                  ),
+                                );
+                                //Text("index : ${resultString[index]}");
+                              },
+                            );
+                          } else {
+                            return Center(
+                              child:
+                                  Lottie.asset('assets/no-data-animation.json'),
+                            );
+                          }
                         }
                       },
                     );
@@ -325,88 +347,151 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  content: SingleChildScrollView(
-                    child: Stack(
-                      overflow: Overflow.visible,
-                      children: <Widget>[
-                        Positioned(
-                          right: -40.0,
-                          top: -40.0,
-                          child: InkResponse(
-                            onTap: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: CircleAvatar(
-                              child: Icon(Icons.close),
-                              backgroundColor: Colors.red,
-                            ),
-                          ),
-                        ),
-                        Form(
-                          child: Container(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
+            context: context,
+            builder: (BuildContext context) {
+              return ScaffoldMessenger(
+                child: Builder(
+                  builder: (context) => Scaffold(
+                    backgroundColor: Colors.transparent,
+                    body: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () => Navigator.of(context).pop(),
+                      child: GestureDetector(
+                        onTap: () {},
+                        child: AlertDialog(
+                          content: SingleChildScrollView(
+                            child: Stack(
+                              clipBehavior: Clip.none,
                               children: <Widget>[
-                                Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: TextFormField(
-                                    controller: userInputHangul,
-                                    autofocus: true,
-                                    decoration:
-                                        InputDecoration(labelText: 'Hangul'),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: TextFormField(
-                                    controller: userInputRomaji,
-                                    decoration:
-                                        InputDecoration(labelText: 'Romaji'),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: TextFormField(
-                                    controller: userInputWord,
-                                    autofocus: true,
-                                    decoration:
-                                        InputDecoration(labelText: 'Indo'),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: RaisedButton(
-                                    child: Text("Submit"),
-                                    onPressed: () {
-                                      firestoreInstance.collection("users").add(
-                                        {
-                                          "hangul": userInputHangul.text,
-                                          "romaji": userInputRomaji.text,
-                                          "word": userInputWord.text,
-                                        },
-                                      ).whenComplete(
-                                        () {
-                                          Navigator.pop(context);
-                                          userInputHangul.text = "";
-                                          userInputRomaji.text = "";
-                                          userInputWord.text = "";
-                                        },
-                                      );
+                                Positioned(
+                                  right: -40.0,
+                                  top: -40.0,
+                                  child: InkResponse(
+                                    onTap: () {
+                                      Navigator.of(context).pop();
                                     },
+                                    child: const CircleAvatar(
+                                      child: Icon(Icons.close),
+                                      backgroundColor: Colors.red,
+                                    ),
                                   ),
-                                )
+                                ),
+                                Form(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: TextFormField(
+                                          controller: userInputHangul,
+                                          autofocus: true,
+                                          decoration: const InputDecoration(
+                                              labelText: 'Hangul'),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: TextFormField(
+                                          controller: userInputRomaji,
+                                          decoration: const InputDecoration(
+                                              labelText: 'Romaji'),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: TextFormField(
+                                          controller: userInputWord,
+                                          autofocus: true,
+                                          decoration: const InputDecoration(
+                                              labelText: 'Indo'),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                              primary: Colors.blue),
+                                          child: const Text("Submit"),
+                                          onPressed: () {
+                                            if (userInputHangul.text.isNotEmpty &&
+                                                userInputRomaji
+                                                    .text.isNotEmpty &&
+                                                userInputWord.text.isNotEmpty) {
+                                              firestoreInstance
+                                                  .collection("users")
+                                                  .add(
+                                                {
+                                                  "hangul":
+                                                      userInputHangul.text,
+                                                  "romaji":
+                                                      userInputRomaji.text,
+                                                  "word": userInputWord.text,
+                                                },
+                                              ).whenComplete(
+                                                () {
+                                                  Navigator.pop(context);
+                                                  userInputHangul.text = "";
+                                                  userInputRomaji.text = "";
+                                                  userInputWord.text = "";
+                                                },
+                                              );
+                                            } else if (userInputHangul
+                                                .text.isEmpty) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                  elevation: 6.0,
+                                                  behavior:
+                                                      SnackBarBehavior.floating,
+                                                  content: Text(
+                                                    'Hangul harus di isi',
+                                                  ),
+                                                ),
+                                              );
+                                            } else if (userInputRomaji
+                                                .text.isEmpty) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                  elevation: 6.0,
+                                                  behavior:
+                                                      SnackBarBehavior.floating,
+                                                  content: Text(
+                                                    'Romaji harus di isi',
+                                                  ),
+                                                ),
+                                              );
+                                            } else if (userInputWord
+                                                .text.isEmpty) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                  elevation: 6.0,
+                                                  behavior:
+                                                      SnackBarBehavior.floating,
+                                                  content: Text(
+                                                    'Indo harus di isi',
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          },
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
                           ),
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                );
-              });
+                ),
+              );
+            },
+          );
         },
         child: const Icon(Icons.add),
       ),
