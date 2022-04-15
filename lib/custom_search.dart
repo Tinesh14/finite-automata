@@ -17,6 +17,7 @@ class CustomSearchDelegate<T> extends SearchDelegate<T?> {
         icon: const Icon(Icons.clear),
         onPressed: () {
           query = '';
+          Navigator.pop(context);
         },
       ),
     ];

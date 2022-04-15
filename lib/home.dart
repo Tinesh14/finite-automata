@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, prefer_const_constructors
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +21,7 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController userInputRomaji = TextEditingController();
   TextEditingController userInputWord = TextEditingController();
   bool indoToKorea = false;
+  final stopWatch = Stopwatch();
 
   addData(String value) {
     firestoreInstance.collection("users").add(
@@ -71,11 +72,17 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
-  static bool searchString(List<String> data, List<String> data1) {
+  static Map searchString(
+      List<String> data, List<String> data1, BuildContext context) {
+    final stopWatch = Stopwatch();
+    stopWatch.start();
     int m = data.length;
     int n = data1.length;
 
-    bool result = false;
+    Map result = {
+      'bool': false,
+      'timeExecution': "",
+    };
     var TF = List.generate(m + 1, (i) => List.filled(256, 0, growable: true));
     computeTF(data, m, TF);
 
@@ -85,7 +92,16 @@ class _MyHomePageState extends State<MyHomePage> {
       debugPrint("cek state value : $state, $i, $n, ${data1[i]}");
       if (state == m) {
         debugPrint("Pattern found at index ${(i - m + 1)}");
-        result = true;
+        String secondsStr = "";
+        if (stopWatch.isRunning) {
+          stopWatch.stop();
+          secondsStr = stopWatch.elapsed.inMilliseconds.toString();
+          debugPrint("waktu stopwatch ${stopWatch.elapsed.inMilliseconds}");
+        }
+        result = {
+          'bool': true,
+          'timeExecution': secondsStr,
+        };
       }
     }
 
@@ -200,6 +216,7 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
+              var resultTimeExecution;
               showSearch(
                 context: context,
                 delegate: CustomSearchDelegate(
@@ -245,74 +262,105 @@ class _MyHomePageState extends State<MyHomePage> {
                             for (var rune in temp.runes) {
                               pat.add(String.fromCharCode(rune));
                             }
-                            var resultBool = searchString(searchText, pat);
-
+                            var resultMap =
+                                searchString(searchText, pat, context);
+                            var resultBool = resultMap['bool'] as bool;
+                            if (resultMap['timeExecution']
+                                .toString()
+                                .isNotEmpty) {
+                              resultTimeExecution =
+                                  resultMap['timeExecution'] as String;
+                              debugPrint("cek : $resultTimeExecution");
+                            }
                             if (resultBool) {
                               resultString.add(element);
                             }
                           }
                           if (resultString.isNotEmpty) {
-                            return ListView.builder(
-                              itemCount: resultString.length,
-                              itemBuilder: (context, index) {
-                                return Card(
-                                  elevation: 8,
-                                  shadowColor: Colors.blue,
-                                  margin: const EdgeInsets.all(20),
-                                  shape: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide:
-                                        const BorderSide(color: Colors.white),
+                            return SingleChildScrollView(
+                              child: Column(
+                                children: [
+                                  const SizedBox(
+                                    height: 20,
                                   ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      const SizedBox(
-                                        height: 5,
+                                  Center(
+                                    child: Text(
+                                      "Waktu yg dibutuhkan : $resultTimeExecution ms",
+                                      style: TextStyle(
+                                        fontSize: 18,
                                       ),
-                                      Text(
-                                        resultString[index]['word'] ?? "",
-                                        //"word",
-                                        style: TextStyle(
-                                          fontSize: indoToKorea ? 18 : 14,
-                                          fontWeight: indoToKorea
-                                              ? FontWeight.bold
-                                              : null,
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text(
-                                        resultString[index]['hangul'] ?? "",
-                                        // "hangul",
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          //fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text(
-                                        resultString[index]['romaji'] ?? "",
-                                        // "romaji",
-                                        style: TextStyle(
-                                          fontSize: !indoToKorea ? 18 : 14,
-                                          fontWeight: !indoToKorea
-                                              ? FontWeight.bold
-                                              : null,
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                );
-                                //Text("index : ${resultString[index]}");
-                              },
+                                  ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: resultString.length,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemBuilder: (context, index) {
+                                      return Card(
+                                        elevation: 8,
+                                        shadowColor: Colors.blue,
+                                        margin: const EdgeInsets.all(20),
+                                        shape: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          borderSide: const BorderSide(
+                                              color: Colors.white),
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            const SizedBox(
+                                              height: 5,
+                                            ),
+                                            Text(
+                                              resultString[index]['word'] ?? "",
+                                              //"word",
+                                              style: TextStyle(
+                                                fontSize: indoToKorea ? 18 : 14,
+                                                fontWeight: indoToKorea
+                                                    ? FontWeight.bold
+                                                    : null,
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              height: 5,
+                                            ),
+                                            Text(
+                                              resultString[index]['hangul'] ??
+                                                  "",
+                                              // "hangul",
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                //fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              height: 5,
+                                            ),
+                                            Text(
+                                              resultString[index]['romaji'] ??
+                                                  "",
+                                              // "romaji",
+                                              style: TextStyle(
+                                                fontSize:
+                                                    !indoToKorea ? 18 : 14,
+                                                fontWeight: !indoToKorea
+                                                    ? FontWeight.bold
+                                                    : null,
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              height: 5,
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                      //Text("index : ${resultString[index]}");
+                                    },
+                                  )
+                                ],
+                              ),
                             );
                           } else {
                             return Center(
