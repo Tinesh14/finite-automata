@@ -21,7 +21,6 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController userInputRomaji = TextEditingController();
   TextEditingController userInputWord = TextEditingController();
   bool indoToKorea = false;
-  final stopWatch = Stopwatch();
 
   addData(String value) {
     firestoreInstance.collection("users").add(
