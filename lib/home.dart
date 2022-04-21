@@ -80,29 +80,31 @@ class _MyHomePageState extends State<MyHomePage> {
 
     Map result = {
       'bool': false,
-      'timeExecution': "",
+      'timeExecution': 0,
     };
     var TF = List.generate(m + 1, (i) => List.filled(256, 0, growable: true));
     computeTF(data, m, TF);
 
     int state = 0;
+    int secondsStr = 0;
+    bool checking = false;
     for (var i = 0; i < n; i++) {
       state = TF[state][data1[i].codeUnits.elementAt(0)];
       debugPrint("cek state value : $state, $i, $n, ${data1[i]}");
       if (state == m) {
         debugPrint("Pattern found at index ${(i - m + 1)}");
-        String secondsStr = "";
         if (stopWatch.isRunning) {
           stopWatch.stop();
-          secondsStr = stopWatch.elapsed.inMilliseconds.toString();
+          secondsStr += stopWatch.elapsed.inMilliseconds;
           debugPrint("waktu stopwatch ${stopWatch.elapsed.inMilliseconds}");
         }
-        result = {
-          'bool': true,
-          'timeExecution': secondsStr,
-        };
+        checking = true;
       }
     }
+    result = {
+      'bool': checking,
+      'timeExecution': secondsStr,
+    };
 
     return result;
     //debugPrint("nilai nya : $m, $n");
@@ -215,7 +217,7 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              var resultTimeExecution;
+              var resultTimeExecution = 0;
               showSearch(
                 context: context,
                 delegate: CustomSearchDelegate(
@@ -267,8 +269,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             if (resultMap['timeExecution']
                                 .toString()
                                 .isNotEmpty) {
-                              resultTimeExecution =
-                                  resultMap['timeExecution'] as String;
+                              resultTimeExecution +=
+                                  resultMap['timeExecution'] as int;
                               debugPrint("cek : $resultTimeExecution");
                             }
                             if (resultBool) {
