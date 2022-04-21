@@ -22,15 +22,15 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController userInputWord = TextEditingController();
   bool indoToKorea = false;
 
-  addData(String value) {
-    firestoreInstance.collection("users").add(
-      {
-        "word": value.toString(),
-      },
-    ).then(
-      (val) => debugPrint("kita cek disini : ${val.id}"),
-    );
-  }
+  // addData(String value) {
+  //   firestoreInstance.collection("users").add(
+  //     {
+  //       "word": value.toString(),
+  //     },
+  //   ).then(
+  //     (val) => debugPrint("kita cek disini : ${val.id}"),
+  //   );
+  // }
 
   // Future<List<String>> getMarker() async {
   //   var snapshot = await firestoreInstance.collection('users').get();
@@ -282,14 +282,15 @@ class _MyHomePageState extends State<MyHomePage> {
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  Center(
-                                    child: Text(
-                                      "Waktu yg dibutuhkan : $resultTimeExecution ms",
-                                      style: TextStyle(
-                                        fontSize: 18,
+                                  if (resultTimeExecution != null)
+                                    Center(
+                                      child: Text(
+                                        "Waktu yg dibutuhkan : $resultTimeExecution ms",
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                        ),
                                       ),
                                     ),
-                                  ),
                                   ListView.builder(
                                     shrinkWrap: true,
                                     itemCount: resultString.length,
@@ -316,8 +317,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                               resultString[index]['word'] ?? "",
                                               //"word",
                                               style: TextStyle(
-                                                fontSize: indoToKorea ? 18 : 14,
-                                                fontWeight: indoToKorea
+                                                fontSize:
+                                                    !indoToKorea ? 18 : 14,
+                                                fontWeight: !indoToKorea
                                                     ? FontWeight.bold
                                                     : null,
                                               ),
@@ -342,9 +344,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                                   "",
                                               // "romaji",
                                               style: TextStyle(
-                                                fontSize:
-                                                    !indoToKorea ? 18 : 14,
-                                                fontWeight: !indoToKorea
+                                                fontSize: indoToKorea ? 18 : 14,
+                                                fontWeight: indoToKorea
                                                     ? FontWeight.bold
                                                     : null,
                                               ),

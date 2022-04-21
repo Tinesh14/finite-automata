@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "281181248877",
-    "project_id": "finite-automata",
-    "storage_bucket": "finite-automata.appspot.com"
+    "project_number": "515645530928",
+    "project_id": "finite-automata-8af63",
+    "storage_bucket": "finite-automata-8af63.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:281181248877:android:1f8e333102b0e60c624e64",
+        "mobilesdk_app_id": "1:515645530928:android:77a8ebf1e4086fd48c1ef5",
         "android_client_info": {
           "package_name": "com.example.finite_automata"
         }
       },
       "oauth_client": [
         {
-          "client_id": "281181248877-ato6uf5kljecvpptjq9ot23shvaiupu8.apps.googleusercontent.com",
+          "client_id": "515645530928-h3oji848qv6eqfra7ekuqhemb0gbd376.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyA_tsZvlIYQ6FMHBwHCLKyxO4lIOXz3HVw"
+          "current_key": "AIzaSyBr6Ny9Ac_h1hzuC4HKFmN0wG1zGQYp2Hk"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "281181248877-ato6uf5kljecvpptjq9ot23shvaiupu8.apps.googleusercontent.com",
+              "client_id": "515645530928-h3oji848qv6eqfra7ekuqhemb0gbd376.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
