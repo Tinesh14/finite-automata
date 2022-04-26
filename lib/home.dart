@@ -74,7 +74,6 @@ class _MyHomePageState extends State<MyHomePage> {
   static Map searchString(
       List<String> data, List<String> data1, BuildContext context) {
     final stopWatch = Stopwatch();
-    stopWatch.start();
     int m = data.length;
     int n = data1.length;
 
@@ -87,7 +86,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
     int state = 0;
     int secondsStr = 0;
+    double temp = 0.0;
     bool checking = false;
+    stopWatch.start();
     for (var i = 0; i < n; i++) {
       state = TF[state][data1[i].codeUnits.elementAt(0)];
       debugPrint("cek state value : $state, $i, $n, ${data1[i]}");
@@ -95,12 +96,17 @@ class _MyHomePageState extends State<MyHomePage> {
         debugPrint("Pattern found at index ${(i - m + 1)}");
         if (stopWatch.isRunning) {
           stopWatch.stop();
-          secondsStr += stopWatch.elapsed.inMilliseconds;
-          debugPrint("waktu stopwatch ${stopWatch.elapsed.inMilliseconds}");
+          double milli = stopWatch.elapsed.inMicroseconds / 1000;
+          temp = temp + milli;
+          // secondsStr += stopWatch.elapsed.inMilliseconds;
+          debugPrint(
+              "waktu stopwatch $temp, ${stopWatch.elapsed.inMicroseconds}");
         }
         checking = true;
+        stopWatch.start();
       }
     }
+    secondsStr = temp.ceil();
     result = {
       'bool': checking,
       'timeExecution': secondsStr,
@@ -210,6 +216,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    var stopWatchBuild = Stopwatch();
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -248,6 +255,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             listString.add(e);
                             // debugPrint("test datanya : ${jsonEncode(e)}, ${e['word']}");
                           }
+                          stopWatchBuild.start();
                           for (var element in listString) {
                             var temp = indoToKorea
                                 ? element['word'].toString().toLowerCase()
@@ -277,6 +285,13 @@ class _MyHomePageState extends State<MyHomePage> {
                               resultString.add(element);
                             }
                           }
+                          stopWatchBuild.stop();
+                          var tempExecution = resultTimeExecution != 0
+                              ? resultTimeExecution
+                              : (stopWatchBuild.elapsed.inMicroseconds / 1000)
+                                  .ceil();
+
+                          resultTimeExecution = 0;
                           if (resultString.isNotEmpty) {
                             return SingleChildScrollView(
                               child: Column(
@@ -284,10 +299,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                   const SizedBox(
                                     height: 20,
                                   ),
-                                  if (resultTimeExecution != null)
+                                  if (tempExecution != null)
                                     Center(
                                       child: Text(
-                                        "Waktu yg dibutuhkan : $resultTimeExecution ms",
+                                        "Waktu yg dibutuhkan : $tempExecution ms",
                                         style: TextStyle(
                                           fontSize: 18,
                                         ),
@@ -365,9 +380,27 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                             );
                           } else {
-                            return Center(
-                              child:
-                                  Lottie.asset('assets/no-data-animation.json'),
+                            return Column(
+                              children: [
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                Center(
+                                  child: Text(
+                                    "Waktu yg dibutuhkan : $tempExecution ms",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                Center(
+                                  child: Lottie.asset(
+                                      'assets/no-data-animation.json'),
+                                )
+                              ],
                             );
                           }
                         }
